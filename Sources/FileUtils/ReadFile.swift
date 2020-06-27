@@ -13,15 +13,6 @@ public extension FileUtils {
         try String(contentsOf: url, encoding: encoding)
     }
 
-    class func readFileByLine(_ url: URL, _ handler: (_ line: String) -> Void) throws {
-        let file: FileReader = .init(fileURL: url)
-        try file.open()
-        defer { file.close() }
-        while let line: String = try file.readLine() {
-            handler(line)
-        }
-    }
-
     class func readFileByLine(_ path: String, _ handler: (_ line: String) -> Void) throws {
         let file: FileReader = .init(filePath: path)
         try file.open()
@@ -29,5 +20,22 @@ public extension FileUtils {
         while let line: String = try file.readLine() {
             handler(line)
         }
+    }
+
+    class func readFileByLine(_ url: URL, _ handler: (_ line: String) -> Void) throws {
+        try readFileByLine(url.path, handler)
+    }
+
+    class func readFileByLine(_ path: String, _ handler: (_ line: String) -> Bool) throws {
+        let file: FileReader = .init(filePath: path)
+        try file.open()
+        defer { file.close() }
+        while let line: String = try file.readLine() {
+            if !handler(line) { break }
+        }
+    }
+
+    class func readFileByLine(_ url: URL, _ handler: (_ line: String) -> Bool) throws {
+        try readFileByLine(url.path, handler)
     }
 }
