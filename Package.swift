@@ -11,12 +11,14 @@ let package = Package(
             targets: ["FileUtils"]),
     ],
     dependencies: [
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(name: "SwiftRegularExpression", url: "https://github.com/nerzh/swift-regular-expression.git", .upToNextMajor(from: "0.2.2")),
     ],
     targets: [
         .target(
             name: "FileUtils",
-            dependencies: []),
+            dependencies: [
+                .product(name: "SwiftRegularExpression", package: "SwiftRegularExpression"),
+            ]),
         .testTarget(
             name: "FileUtilsTests",
             dependencies: ["FileUtils"]),

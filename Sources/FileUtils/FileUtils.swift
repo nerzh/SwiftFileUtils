@@ -1,7 +1,8 @@
 import Foundation
-
+import SwiftRegularExpression
 
 public class FileUtils {}
+
 
 public extension FileUtils {
 
@@ -99,4 +100,59 @@ public extension FileUtils {
         let exists = FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory)
         return exists && isDirectory.boolValue
     }
+
+    class func absolutePath(_ path: String) throws -> String {
+        let pointer: UnsafeMutablePointer<Int8>? = realpath(path, nil)
+        guard
+            let cStringPointer: UnsafeMutablePointer<Int8> = pointer
+            else { throw fatalError("unknown error for path: \(path)\nPlease, check your path.\n") }
+        defer { free(cStringPointer) }
+
+        return String(cString: cStringPointer)
+    }
+
+    class func absolutePath(_ url: URL) throws -> String {
+        try absolutePath(url.path)
+    }
+
+    class func urlEncode(_ string: String) -> String {
+        var allowedCharacters = CharacterSet.alphanumerics
+        allowedCharacters.insert(charactersIn: ".-_")
+
+        return string.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
+    }
+
+    class func makeRelativePath(from projectPath: String, to filePath: String) -> String? {
+        guard let realProjectPath: String = try? absolutePath(projectPath) else { return nil }
+        return filePath.replace(realProjectPath, "")
+    }
+
+    class func readDirectory(path: String, _ handler: (URL) -> Void) {
+        urls(for: urlEncode(path)).forEach { handler($0) }
+    }
+
+    class func readDirectory(path: URL, _ handler: (URL) -> Void) {
+        readDirectory(path: path.path, handler)
+    }
+
+    class func recursiveReadDirectory(path: String, _ handler: (_ folder: String, _ file: URL) -> Void) {
+        readDirectory(path: path) { (url) in
+            if isDirectory(url) {
+                recursiveReadDirectory(path: url.path, handler)
+            } else {
+                handler(path, url)
+            }
+        }
+    }
+
+    class func recursiveReadDirectory(path: URL, _ handler: (_ folder: URL, _ file: URL) -> Void) {
+        readDirectory(path: path) { (url) in
+            if isDirectory(url) {
+                recursiveReadDirectory(path: url, handler)
+            } else {
+                handler(path, url)
+            }
+        }
+    }
+
 }
