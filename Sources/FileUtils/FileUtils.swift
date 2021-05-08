@@ -22,6 +22,17 @@ public extension FileUtils {
     class func createFile(_ url: URL?) {
         createFile(url?.path)
     }
+
+    class func createFolder(_ url: URL?) {
+        do {
+            let fileManager = FileManager.default
+            if let url = url {
+                try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
+            }
+        } catch {
+            fatalError("Create Folder Error: \(error.localizedDescription)")
+        }
+    }
     
     class func deleteFileOrFolder(_ url: URL?) {
         do {
