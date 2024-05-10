@@ -30,11 +30,11 @@ public extension FileUtils {
         try readStringByLine(url.path, handler)
     }
     
-    class func readFileByLine(_ url: URL, maxLength: Int = 4096, _ handler: (_ line: Data) throws -> Void) throws {
-        try readFileByLine(url.path, maxLength: maxLength, handler)
+    class func readDataByLine(_ url: URL, maxLength: Int = 4096, _ handler: (_ line: Data) throws -> Void) throws {
+        try readDataByLine(url.path, maxLength: maxLength, handler)
     }
     
-    class func readFileByLine(_ path: String, maxLength: Int = 4096, _ handler: (_ line: Data) throws -> Void) throws {
+    class func readDataByLine(_ path: String, maxLength: Int = 4096, _ handler: (_ line: Data) throws -> Void) throws {
         let file: FileReader = .init(filePath: path)
         try file.open()
         defer { file.close() }
